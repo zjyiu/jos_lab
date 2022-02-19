@@ -1,5 +1,3 @@
-# <center>LAB4 实验报告</center>
-
 ## 任务一
 
 ​		先来看boot_map_region函数：
