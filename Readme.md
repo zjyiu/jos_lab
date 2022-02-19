@@ -1,5 +1,3 @@
-# <center>JOS lab3 实验报告</center>
-
 ## A.	基础代码实现
 
 ### Exercise2
