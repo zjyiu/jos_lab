@@ -1,5 +1,3 @@
-# ​<center>LAB6 文件系统实验报告</center>
-
 ## Exercise 1
 
 ```c++
