@@ -277,29 +277,3 @@ jmp	*%eax
 	= ((uintptr_t)entry_pgtable - KERNBASE) + PTE_P + PTE_W
 ```
 ​&emsp;&emsp;可以看到这里将虚拟地址`[0, 4MB)`和`[KERNBASE, KERNBASE+4MB)`都映射到了物理地址`[0, 4MB)`。所以只要`eip`的地址小于4MB，就能通过虚拟地址映射到正确的物理地址，因此此时能在低地址`eip`运行。
-## 任务四
-### 相同点
-1. 两者的线性地址结构相同，均是10位的页目录索引+10位的页表索引+12位的物理页偏移。
-2. 两者一页的大小均为4KB，一个页表的大小也均为4KB，包含1024个页表项，页目录项和页表项中也均含有权限标记位。
-3. 内核代码、数据的虚拟地址均位于高地址，即都在各自的`KERNBASE`之上。
-4. 两者对于物理页的分配和释放都由内核完成，用户只需要针对虚拟地址进行管理即可。
-5. 未分配的内存两者均会放到一个链表中管理。
-6. 每个进程都有自己单独的页表。
-### 不同点
-1. xv6管理空闲页面的链表中没有用来表示指向该页面的指针数量的变量，系统在释放虚拟页面时会直接释放对应的物理页面。
-2. xv6利用一个`kmap`的结构体来设置内存权限：
-```c++
-static struct kmap {
-  void *virt;
-  uint phys_start;
-  uint phys_end;
-  int perm;
-} kmap[] = {
- { (void*)KERNBASE, 0,             EXTMEM,    PTE_W}, // I/O space
- { (void*)KERNLINK, V2P(KERNLINK), V2P(data), 0},     // kern text+rodata
- { (void*)data,     V2P(data),     PHYSTOP,   PTE_W}, // kern data+memory
- { (void*)DEVSPACE, DEVSPACE,      0,         PTE_W}, // more devices
-};
-```
-3. xv6释放和分配页面不是一个页面一个页面地分配和释放，而是利用`oldsz`和`newsz`两个参数来控制分配和释放的空间大小。
-4. jos的`KERNBASE`是`0xf0000000`，xv6是`0x80000000`。
